@@ -1,0 +1,24 @@
+{
+  "name": "checkout-sdk",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./dist/paze-checkout.umd.cjs",
+  "module": "./dist/paze-checkout.js",
+  "exports": {
+    ".": {
+      "import": "./dist/paze-checkout.js",
+      "require": "./dist/paze-checkout.umd.cjs"
+    }
+  },
+  "scripts": {
+    "build": "tsc && vite build",
+    "build:iframe": "vite build --config vite.iframe.config.ts",
+    "build:all": "npm run build && npm run build:iframe",
+    "dev": "vite"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2",
+    "vite": "^6.0.5",
+    "vite-plugin-dts": "^4.3.0"
+  }
+}
