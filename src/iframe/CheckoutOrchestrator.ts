@@ -44,6 +44,7 @@ export interface CheckoutState {
   authToken?: string;
   challengeId?: string;
   deviceChallenge?: string;
+  knownDeviceId?: string;
   cards?: CardDto[];
   userProfile?: UserProfile;
   addresses?: AddressDto[];
@@ -64,6 +65,7 @@ export class CheckoutOrchestrator {
 
   async start(): Promise<void> {
     await this.deviceKeyManager.open();
+    const knownDeviceId = this.deviceKeyManager.getStoredDeviceId() ?? undefined;
     this.showLoading('Starting checkout...');
     try {
       const res = await this.fetchJson('/api/v1/auth/sessions', {
@@ -79,6 +81,7 @@ export class CheckoutOrchestrator {
         challengeId: res.challengeId as string,
         otpCode: res.otpCode as string | undefined,
         deviceChallenge: res.deviceChallenge as string | undefined,
+        knownDeviceId,
       };
       this.renderStep('OTP_VERIFY', res);
     } catch (err) {
@@ -103,10 +106,15 @@ export class CheckoutOrchestrator {
         if (deviceResponse) {
           this.onActionResponse(deviceResponse);
         } else {
+          this.state = { ...this.state, deviceChallenge: undefined };
           this.renderStep('CARD_SELECT', {});
         }
       });
       return;
+    }
+
+    if (step === 'CARD_SELECT' && !response.deviceChallenge) {
+      this.state = { ...this.state, deviceChallenge: undefined };
     }
 
     // Non-blocking device registration after CVV — once per session only
@@ -165,19 +173,31 @@ export class CheckoutOrchestrator {
 
   private async tryDeviceVerify(deviceChallenge: string): Promise<Record<string, unknown> | null> {
     const deviceId = this.deviceKeyManager.getStoredDeviceId();
-    if (!deviceId) return null;
+    if (!deviceId) {
+      console.log('[PazeCheckout] No stored device ID, skipping device verification');
+      return null;
+    }
     try {
       const signature = await this.deviceKeyManager.signChallenge(deviceChallenge);
-      return await this.fetchJson(`/api/v1/auth/sessions/${this.state.authSessionId}/action`, {
+      const result = await this.fetchJson(`/api/v1/auth/sessions/${this.state.authSessionId}/action`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'DEVICE_VERIFY', deviceId, signature }),
       });
-    } catch { return null; }
+      console.log('[PazeCheckout] Device verification succeeded for deviceId:', deviceId);
+      return result;
+    } catch (err) {
+      console.warn('[PazeCheckout] Device verification failed for deviceId:', deviceId, err);
+      return null;
+    }
   }
 
   private async registerDeviceNonBlocking(): Promise<void> {
     try {
+      // Clear stale deviceId before generating new key pair.
+      // If the registration HTTP call fails after key generation, localStorage will be empty
+      // rather than pointing to a device whose public key no longer matches IndexedDB.
+      this.deviceKeyManager.clearDeviceId();
       const publicKeyJwk = await this.deviceKeyManager.generateAndStoreKeyPair();
       const res = await this.fetchJson('/api/v1/auth/device/register', {
         method: 'POST',
@@ -185,6 +205,8 @@ export class CheckoutOrchestrator {
         body: JSON.stringify({ publicKey: JSON.stringify(publicKeyJwk) }),
       });
       this.deviceKeyManager.storeDeviceId(res.deviceId as string);
+      this.state = { ...this.state, knownDeviceId: res.deviceId as string };
+      console.log('[PazeCheckout] Device registered:', res.deviceId);
     } catch (err) {
       console.warn('[PazeCheckout] Device registration failed:', err);
       this.showDeviceWarning();

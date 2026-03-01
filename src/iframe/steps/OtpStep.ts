@@ -60,6 +60,7 @@ export class OtpStep {
       this.orchestrator.sendAction('VERIFY_OTP', {
         challengeId: this.state.challengeId,
         otpCode,
+        deviceId: this.state.knownDeviceId,
       }).finally(() => {
         btn.disabled = false;
         btn.textContent = 'Verify Code';

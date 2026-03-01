@@ -4,7 +4,15 @@ import { MessageBus } from './MessageBus';
 import { buildIframeUrl } from './utils/buildIframeUrl';
 import { generateNonce } from './utils/generateNonce';
 
+const activeMounts = new WeakMap<HTMLElement, () => void>();
+
 export function mount(container: HTMLElement, config: PazeCheckoutConfig): () => void {
+  const existingUnmount = activeMounts.get(container);
+  if (existingUnmount) {
+    existingUnmount();
+    activeMounts.delete(container);
+  }
+
   const iframeManager = new IframeManager();
   const backendOrigin = new URL(config.backendUrl).origin;
   const messageBus = new MessageBus(backendOrigin);
@@ -64,12 +72,18 @@ export function mount(container: HTMLElement, config: PazeCheckoutConfig): () =>
   });
 
   // Return unmount function
-  return () => {
+  const unmount = () => {
     cancelled = true;
     abortController.abort();
     iframeManager.destroy();
     messageBus.destroy();
+    if (activeMounts.get(container) === unmount) {
+      activeMounts.delete(container);
+    }
   };
+
+  activeMounts.set(container, unmount);
+  return unmount;
 }
 
 async function createCheckoutSession(

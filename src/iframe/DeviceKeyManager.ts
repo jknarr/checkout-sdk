@@ -28,6 +28,10 @@ export class DeviceKeyManager {
     localStorage.setItem(DEVICE_ID_KEY, deviceId);
   }
 
+  clearDeviceId(): void {
+    localStorage.removeItem(DEVICE_ID_KEY);
+  }
+
   async generateAndStoreKeyPair(): Promise<JsonWebKey> {
     if (!crypto?.subtle) throw new Error('Web Crypto unavailable (non-secure context)');
     const keyPair = await crypto.subtle.generateKey(
