@@ -1,4 +1,4 @@
-import type { CheckoutOrchestrator, CheckoutState, AddressDto } from '../CheckoutOrchestrator';
+import type { CheckoutOrchestrator, CheckoutState, AddressDto, PasskeyDto } from '../CheckoutOrchestrator';
 
 export class ReviewStep {
   constructor(
@@ -167,6 +167,81 @@ export class ReviewStep {
     });
     this.root.appendChild(cancelBtn);
 
+    this.renderPasskeyManagement().catch(() => {
+      // Non-blocking section; keep checkout flow available even if this request fails.
+    });
+
+    this.orchestrator.sendResize();
+  }
+
+  private async renderPasskeyManagement(): Promise<void> {
+    if (!this.state.authToken) {
+      return;
+    }
+
+    let passkeys: PasskeyDto[] = [];
+    try {
+      passkeys = await this.orchestrator.listPasskeys();
+    } catch {
+      return;
+    }
+
+    const section = document.createElement('div');
+    section.className = 'review-section';
+
+    const header = document.createElement('div');
+    header.className = 'review-section-title';
+    header.textContent = 'Saved Passkeys';
+    section.appendChild(header);
+
+    if (passkeys.length === 0) {
+      const empty = document.createElement('div');
+      empty.className = 'review-card-info';
+      empty.textContent = 'No passkeys registered yet.';
+      section.appendChild(empty);
+      this.root.appendChild(section);
+      this.orchestrator.sendResize();
+      return;
+    }
+
+    passkeys.forEach(passkey => {
+      const row = document.createElement('div');
+      row.className = 'passkey-row';
+
+      const info = document.createElement('div');
+      info.className = 'passkey-info';
+      const label = passkey.label ?? `Passkey ${passkey.credentialId.slice(0, 10)}...`;
+      const created = new Date(passkey.createdAt).toLocaleDateString();
+      info.textContent = `${label} • Added ${created}`;
+      row.appendChild(info);
+
+      const removeBtn = document.createElement('button');
+      removeBtn.className = 'review-change-btn';
+      removeBtn.textContent = 'Remove';
+      removeBtn.addEventListener('click', async () => {
+        removeBtn.disabled = true;
+        try {
+          await this.orchestrator.revokePasskey(passkey.credentialId);
+          row.remove();
+          if (!section.querySelector('.passkey-row')) {
+            const none = document.createElement('div');
+            none.className = 'review-card-info';
+            none.textContent = 'No passkeys registered yet.';
+            section.appendChild(none);
+          }
+          this.orchestrator.sendResize();
+        } catch (err) {
+          this.orchestrator.showError(err instanceof Error ? err.message : 'Failed to remove passkey');
+        } finally {
+          removeBtn.disabled = false;
+        }
+      });
+      row.appendChild(removeBtn);
+
+      section.appendChild(row);
+    });
+
+    this.root.appendChild(section);
     this.orchestrator.sendResize();
   }
 }

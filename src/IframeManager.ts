@@ -5,6 +5,7 @@ export class IframeManager {
     this.iframe = document.createElement('iframe');
     this.iframe.src = src;
     this.iframe.setAttribute('sandbox', 'allow-scripts allow-forms allow-same-origin');
+    this.iframe.allow = 'publickey-credentials-create; publickey-credentials-get';
     this.iframe.style.cssText = [
       'width: 100%',
       'border: none',

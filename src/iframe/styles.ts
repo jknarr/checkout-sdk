@@ -41,6 +41,9 @@ export function injectStyles(): void {
     .review-card-row { display: flex; align-items: center; gap: 10px; }
     .review-card-art { width: 48px; height: 30px; border-radius: 4px; object-fit: cover; }
     .review-card-info { font-size: 13px; font-weight: 500; }
+    .passkey-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 0; border-top: 1px solid #e5e7eb; }
+    .passkey-row:first-of-type { border-top: none; }
+    .passkey-info { font-size: 12px; color: #374151; }
 
     .address-select { width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 13px; }
 

@@ -1,4 +1,5 @@
 import type { CheckoutOrchestrator, CheckoutState } from '../CheckoutOrchestrator';
+import { publicKeyCredentialSupported } from '../passkey';
 
 export class OtpStep {
   constructor(
@@ -67,6 +68,21 @@ export class OtpStep {
       });
     });
     this.root.appendChild(btn);
+
+    if (this.state.hasPasskey && publicKeyCredentialSupported()) {
+      const passkeyBtn = document.createElement('button');
+      passkeyBtn.className = 'paze-btn paze-btn-secondary';
+      passkeyBtn.textContent = 'Use passkey instead';
+      passkeyBtn.addEventListener('click', () => {
+        passkeyBtn.disabled = true;
+        passkeyBtn.textContent = 'Preparing...';
+        this.orchestrator.sendAction('PASSKEY_AUTH_BEGIN').finally(() => {
+          passkeyBtn.disabled = false;
+          passkeyBtn.textContent = 'Use passkey instead';
+        });
+      });
+      this.root.appendChild(passkeyBtn);
+    }
 
     inputs[0].focus();
     this.orchestrator.sendResize();
