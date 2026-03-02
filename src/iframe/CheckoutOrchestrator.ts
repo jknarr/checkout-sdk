@@ -57,12 +57,17 @@ export interface CheckoutState {
   hasPasskey?: boolean;
   passkeyOptions?: object;
   passkeyOfferHandled?: boolean;
+  passkeyAutoAttempted?: boolean;
   cards?: CardDto[];
   userProfile?: UserProfile;
   addresses?: AddressDto[];
   selectedCard?: CardDto;
   selectedAddress?: AddressDto;
   passkeys?: PasskeyDto[];
+  subtotal?: number;
+  shippingCost?: number;
+  tax?: number;
+  total?: number;
 }
 
 type AuthStep =
@@ -107,6 +112,12 @@ export class CheckoutOrchestrator {
         knownDeviceId,
       };
 
+      if (this.shouldAutoAttemptPasskey()) {
+        this.state = { ...this.state, passkeyAutoAttempted: true };
+        await this.sendAction('PASSKEY_AUTH_BEGIN');
+        return;
+      }
+
       this.renderStep('OTP_VERIFY', res);
     } catch (_err) {
       this.showError('Failed to start checkout. Please try again.');
@@ -123,7 +134,13 @@ export class CheckoutOrchestrator {
     if (response.selectedCard) this.state = { ...this.state, selectedCard: response.selectedCard as CardDto };
     if (response.selectedAddress) this.state = { ...this.state, selectedAddress: response.selectedAddress as AddressDto };
     if (response.deviceChallenge) this.state = { ...this.state, deviceChallenge: response.deviceChallenge as string };
+    if (response.challengeId) this.state = { ...this.state, challengeId: response.challengeId as string };
+    if (response.otpCode) this.state = { ...this.state, otpCode: response.otpCode as string };
     if (response.passkeyOptions) this.state = { ...this.state, passkeyOptions: response.passkeyOptions as object };
+    if (response.subtotal !== undefined) this.state = { ...this.state, subtotal: parseAmount(response.subtotal) };
+    if (response.shippingCost !== undefined) this.state = { ...this.state, shippingCost: parseAmount(response.shippingCost) };
+    if (response.tax !== undefined) this.state = { ...this.state, tax: parseAmount(response.tax) };
+    if (response.total !== undefined) this.state = { ...this.state, total: parseAmount(response.total) };
 
     if (step === 'CARD_SELECT' && response.deviceChallenge) {
       const deviceChallenge = response.deviceChallenge as string;
@@ -141,6 +158,12 @@ export class CheckoutOrchestrator {
 
     if (step === 'CARD_SELECT' && !response.deviceChallenge) {
       this.state = { ...this.state, deviceChallenge: undefined };
+    }
+
+    if (step === 'OTP_VERIFY' && this.shouldAutoAttemptPasskey()) {
+      this.state = { ...this.state, passkeyAutoAttempted: true };
+      this.sendAction('PASSKEY_AUTH_BEGIN');
+      return;
     }
 
     if (step === 'REVIEW' && response.authToken && !this.state.deviceChallenge && !this.deviceRegistrationAttempted) {
@@ -226,13 +249,13 @@ export class CheckoutOrchestrator {
       );
 
       window.parent.postMessage(
-        { type: 'PAZE_SUCCESS', nonce: this.state.nonce, payload: { ...res, nonce: this.state.nonce } },
+        { type: 'DEMO_SUCCESS', nonce: this.state.nonce, payload: { ...res, nonce: this.state.nonce } },
         this.state.parentOrigin
       );
     } catch (err) {
       window.parent.postMessage(
         {
-          type: 'PAZE_ERROR',
+          type: 'DEMO_ERROR',
           nonce: this.state.nonce,
           payload: { code: 'SUBMIT_FAILED', message: String(err), nonce: this.state.nonce },
         },
@@ -358,11 +381,31 @@ export class CheckoutOrchestrator {
   sendResize(): void {
     window.parent.postMessage(
       {
-        type: 'PAZE_RESIZE',
+        type: 'DEMO_RESIZE',
         nonce: this.state.nonce,
         payload: { height: document.body.scrollHeight + 32, nonce: this.state.nonce },
       },
       this.state.parentOrigin
     );
   }
+
+  private shouldAutoAttemptPasskey(): boolean {
+    return !!this.state.hasPasskey
+      && !this.state.passkeyAutoAttempted
+      && typeof window.PublicKeyCredential !== 'undefined'
+      && !!navigator.credentials;
+  }
+}
+
+function parseAmount(value: unknown): number {
+  if (typeof value === 'number') {
+    return value;
+  }
+  if (typeof value === 'string') {
+    const parsed = Number(value);
+    if (!Number.isNaN(parsed)) {
+      return parsed;
+    }
+  }
+  return 0;
 }

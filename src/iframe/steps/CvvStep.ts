@@ -11,23 +11,23 @@ export class CvvStep {
     this.root.innerHTML = '';
 
     const title = document.createElement('h2');
-    title.className = 'paze-title';
+    title.className = 'demo-title';
     title.textContent = 'Enter CVV';
     this.root.appendChild(title);
 
     if (this.state.selectedCard) {
       const card = this.state.selectedCard;
       const subtitle = document.createElement('p');
-      subtitle.className = 'paze-subtitle';
+      subtitle.className = 'demo-subtitle';
       subtitle.textContent = `${card.cardType} ending in ${card.last4}`;
       this.root.appendChild(subtitle);
     }
 
     const field = document.createElement('div');
-    field.className = 'paze-field';
+    field.className = 'demo-field';
 
     const label = document.createElement('label');
-    label.className = 'paze-label';
+    label.className = 'demo-label';
     label.textContent = 'CVV / Security Code';
     field.appendChild(label);
 
@@ -35,7 +35,7 @@ export class CvvStep {
     input.type = 'password';
     input.inputMode = 'numeric';
     input.maxLength = 4;
-    input.className = 'paze-input';
+    input.className = 'demo-input';
     input.placeholder = '•••';
     input.style.letterSpacing = '4px';
     input.style.maxWidth = '120px';
@@ -44,7 +44,7 @@ export class CvvStep {
     this.root.appendChild(field);
 
     const btn = document.createElement('button');
-    btn.className = 'paze-btn paze-btn-primary';
+    btn.className = 'demo-btn demo-btn-primary';
     btn.textContent = 'Verify';
     btn.addEventListener('click', () => {
       const cvv = input.value.trim();

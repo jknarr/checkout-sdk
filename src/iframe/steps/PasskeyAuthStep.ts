@@ -16,17 +16,17 @@ export class PasskeyAuthStep {
     this.root.innerHTML = '';
 
     const title = document.createElement('h2');
-    title.className = 'paze-title';
+    title.className = 'demo-title';
     title.textContent = 'Sign in with passkey';
     this.root.appendChild(title);
 
     const subtitle = document.createElement('p');
-    subtitle.className = 'paze-subtitle';
+    subtitle.className = 'demo-subtitle';
     subtitle.textContent = 'Authenticate using your fingerprint, face, or device PIN.';
     this.root.appendChild(subtitle);
 
     const authBtn = document.createElement('button');
-    authBtn.className = 'paze-btn paze-btn-primary';
+    authBtn.className = 'demo-btn demo-btn-primary';
     authBtn.textContent = 'Use passkey';
     authBtn.addEventListener('click', async () => {
       authBtn.disabled = true;
@@ -54,7 +54,7 @@ export class PasskeyAuthStep {
     this.root.appendChild(authBtn);
 
     const fallbackBtn = document.createElement('button');
-    fallbackBtn.className = 'paze-btn paze-btn-secondary';
+    fallbackBtn.className = 'demo-btn demo-btn-secondary';
     fallbackBtn.textContent = 'Use phone verification instead';
     fallbackBtn.addEventListener('click', async () => {
       fallbackBtn.disabled = true;

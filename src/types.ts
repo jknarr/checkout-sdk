@@ -17,7 +17,7 @@ export interface ShippingAddressDto {
   country: string;
 }
 
-export interface PazeCheckoutConfig {
+export interface DemoCheckoutConfig {
   merchantId: string;
   backendUrl: string;
   cart: CartItemDto[];

@@ -11,7 +11,7 @@ export class CardSelectStep {
     this.root.innerHTML = '';
 
     const title = document.createElement('h2');
-    title.className = 'paze-title';
+    title.className = 'demo-title';
     title.textContent = 'Select a card';
     this.root.appendChild(title);
 
@@ -58,7 +58,7 @@ export class CardSelectStep {
     this.root.appendChild(grid);
 
     const btn = document.createElement('button');
-    btn.className = 'paze-btn paze-btn-primary';
+    btn.className = 'demo-btn demo-btn-primary';
     btn.textContent = 'Continue';
     btn.addEventListener('click', () => {
       if (!selectedCardId) return;

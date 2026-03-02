@@ -1,4 +1,4 @@
-import { PazeCheckoutConfig, CartItemDto, CheckoutSuccessResult, CheckoutError } from './types';
+import { DemoCheckoutConfig, CartItemDto, CheckoutSuccessResult, CheckoutError } from './types';
 import { IframeManager } from './IframeManager';
 import { MessageBus } from './MessageBus';
 import { buildIframeUrl } from './utils/buildIframeUrl';
@@ -6,7 +6,7 @@ import { generateNonce } from './utils/generateNonce';
 
 const activeMounts = new WeakMap<HTMLElement, () => void>();
 
-export function mount(container: HTMLElement, config: PazeCheckoutConfig): () => void {
+export function mount(container: HTMLElement, config: DemoCheckoutConfig): () => void {
   const existingUnmount = activeMounts.get(container);
   if (existingUnmount) {
     existingUnmount();
@@ -32,12 +32,12 @@ export function mount(container: HTMLElement, config: PazeCheckoutConfig): () =>
       const iframeSrc = buildIframeUrl(config.backendUrl, config.merchantId);
       const iframe = iframeManager.create(container, iframeSrc);
 
-      // Step 3: Send PAZE_INIT once iframe loads
+      // Step 3: Send DEMO_INIT once iframe loads
       iframe.addEventListener('load', () => {
         const contentWindow = iframeManager.getContentWindow();
         if (contentWindow) {
           messageBus.send(contentWindow, backendOrigin, {
-            type: 'PAZE_INIT',
+            type: 'DEMO_INIT',
             nonce,
             payload: { sessionId, backendUrl: config.backendUrl, merchantId: config.merchantId, nonce },
           });
@@ -50,22 +50,22 @@ export function mount(container: HTMLElement, config: PazeCheckoutConfig): () =>
     });
 
   // Wire up callbacks
-  messageBus.on('PAZE_SUCCESS', msg => {
+  messageBus.on('DEMO_SUCCESS', msg => {
     if ((msg.payload as { nonce: string }).nonce !== nonce) return;
     config.onSuccess(msg.payload as CheckoutSuccessResult);
   });
 
-  messageBus.on('PAZE_ERROR', msg => {
+  messageBus.on('DEMO_ERROR', msg => {
     if ((msg.payload as { nonce: string }).nonce !== nonce) return;
     config.onError(msg.payload as CheckoutError);
   });
 
-  messageBus.on('PAZE_CANCEL', msg => {
+  messageBus.on('DEMO_CANCEL', msg => {
     if ((msg.payload as { nonce: string }).nonce !== nonce) return;
     config.onCancel();
   });
 
-  messageBus.on('PAZE_RESIZE', msg => {
+  messageBus.on('DEMO_RESIZE', msg => {
     if ((msg.payload as { nonce: string }).nonce !== nonce) return;
     const { height } = msg.payload as { height: number; nonce: string };
     iframeManager.setHeight(height);

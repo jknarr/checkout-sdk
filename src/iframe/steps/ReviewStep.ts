@@ -11,7 +11,7 @@ export class ReviewStep {
     this.root.innerHTML = '';
 
     const title = document.createElement('h2');
-    title.className = 'paze-title';
+    title.className = 'demo-title';
     title.textContent = 'Review your order';
     this.root.appendChild(title);
 
@@ -98,12 +98,12 @@ export class ReviewStep {
       wrap.className = ['address', 'city'].includes(key) ? 'full-width' : '';
 
       const lbl = document.createElement('label');
-      lbl.className = 'paze-label';
+      lbl.className = 'demo-label';
       lbl.textContent = label;
       wrap.appendChild(lbl);
 
       const inp = document.createElement('input');
-      inp.className = 'paze-input';
+      inp.className = 'demo-input';
       inp.placeholder = label;
       if (key === 'country') inp.value = 'US';
       inputMap[key] = inp;
@@ -127,19 +127,25 @@ export class ReviewStep {
     shippingSection.appendChild(addressDisplay);
     this.root.appendChild(shippingSection);
 
-    // Totals (placeholder — real values come from submit response)
+    const subtotal = this.state.subtotal;
+    const shippingCost = this.state.shippingCost;
+    const tax = this.state.tax;
+    const total = this.state.total;
+
+    const hasTotals = [subtotal, shippingCost, tax, total].every(v => typeof v === 'number');
+
     const totals = document.createElement('div');
     totals.className = 'totals';
     totals.innerHTML = `
-      <div class="total-row"><span>Subtotal</span><span>—</span></div>
-      <div class="total-row"><span>Shipping</span><span>—</span></div>
-      <div class="total-row"><span>Tax</span><span>—</span></div>
-      <div class="total-row grand"><span>Total</span><span>—</span></div>
+      <div class="total-row"><span>Subtotal</span><span>${hasTotals ? formatCurrency(subtotal as number) : '—'}</span></div>
+      <div class="total-row"><span>Shipping</span><span>${hasTotals ? formatCurrency(shippingCost as number) : '—'}</span></div>
+      <div class="total-row"><span>Tax</span><span>${hasTotals ? formatCurrency(tax as number) : '—'}</span></div>
+      <div class="total-row grand"><span>Total</span><span>${hasTotals ? formatCurrency(total as number) : '—'}</span></div>
     `;
     this.root.appendChild(totals);
 
     const placeOrderBtn = document.createElement('button');
-    placeOrderBtn.className = 'paze-btn paze-btn-primary';
+    placeOrderBtn.className = 'demo-btn demo-btn-primary';
     placeOrderBtn.textContent = 'Place Order';
     placeOrderBtn.addEventListener('click', async () => {
       if (showingNewAddressForm) {
@@ -157,11 +163,11 @@ export class ReviewStep {
     this.root.appendChild(placeOrderBtn);
 
     const cancelBtn = document.createElement('button');
-    cancelBtn.className = 'paze-btn paze-btn-secondary';
+    cancelBtn.className = 'demo-btn demo-btn-secondary';
     cancelBtn.textContent = 'Cancel';
     cancelBtn.addEventListener('click', () => {
       window.parent.postMessage(
-        { type: 'PAZE_CANCEL', nonce: this.state.nonce, payload: { nonce: this.state.nonce } },
+        { type: 'DEMO_CANCEL', nonce: this.state.nonce, payload: { nonce: this.state.nonce } },
         this.state.parentOrigin
       );
     });
@@ -244,4 +250,8 @@ export class ReviewStep {
     this.root.appendChild(section);
     this.orchestrator.sendResize();
   }
+}
+
+function formatCurrency(value: number): string {
+  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
 }

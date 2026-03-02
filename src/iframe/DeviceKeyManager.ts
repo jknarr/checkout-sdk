@@ -1,7 +1,7 @@
-const DB_NAME = 'paze-device';
+const DB_NAME = 'demo-device';
 const STORE_NAME = 'keys';
 const KEY_ID = 'device-private-key';
-const DEVICE_ID_KEY = 'paze_device_id';
+const DEVICE_ID_KEY = 'demo_device_id';
 
 export class DeviceKeyManager {
   private db: IDBDatabase | null = null;

@@ -3,22 +3,22 @@ export function injectStyles(): void {
   style.textContent = `
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; color: #1a1a1a; background: #fff; padding: 16px; }
-    #paze-root { max-width: 480px; margin: 0 auto; }
+    #demo-root { max-width: 480px; margin: 0 auto; }
 
-    .paze-title { font-size: 18px; font-weight: 600; margin-bottom: 16px; color: #111; }
-    .paze-subtitle { font-size: 13px; color: #666; margin-bottom: 20px; }
+    .demo-title { font-size: 18px; font-weight: 600; margin-bottom: 16px; color: #111; }
+    .demo-subtitle { font-size: 13px; color: #666; margin-bottom: 20px; }
 
-    .paze-field { margin-bottom: 14px; }
-    .paze-label { display: block; font-size: 12px; font-weight: 500; color: #555; margin-bottom: 4px; }
-    .paze-input { width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; outline: none; transition: border-color 0.15s; }
-    .paze-input:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+    .demo-field { margin-bottom: 14px; }
+    .demo-label { display: block; font-size: 12px; font-weight: 500; color: #555; margin-bottom: 4px; }
+    .demo-input { width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; outline: none; transition: border-color 0.15s; }
+    .demo-input:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
 
-    .paze-btn { width: 100%; padding: 12px; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
-    .paze-btn-primary { background: #2563eb; color: #fff; }
-    .paze-btn-primary:hover { background: #1d4ed8; }
-    .paze-btn-primary:disabled { background: #93c5fd; cursor: not-allowed; }
-    .paze-btn-secondary { background: #f3f4f6; color: #374151; margin-top: 8px; }
-    .paze-btn-secondary:hover { background: #e5e7eb; }
+    .demo-btn { width: 100%; padding: 12px; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
+    .demo-btn-primary { background: #2563eb; color: #fff; }
+    .demo-btn-primary:hover { background: #1d4ed8; }
+    .demo-btn-primary:disabled { background: #93c5fd; cursor: not-allowed; }
+    .demo-btn-secondary { background: #f3f4f6; color: #374151; margin-top: 8px; }
+    .demo-btn-secondary:hover { background: #e5e7eb; }
 
     .otp-inputs { display: flex; gap: 8px; justify-content: center; margin-bottom: 20px; }
     .otp-input { width: 44px; height: 52px; text-align: center; font-size: 22px; font-weight: 600; border: 1px solid #d1d5db; border-radius: 8px; outline: none; }

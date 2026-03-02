@@ -11,7 +11,12 @@ export function base64UrlToBuffer(base64url: string): ArrayBuffer {
 }
 
 export function arrayBufferToBase64Url(buf: ArrayBuffer): string {
-  return btoa(String.fromCharCode(...new Uint8Array(buf)))
+  const bytes = new Uint8Array(buf);
+  let binary = '';
+  for (const byte of bytes) {
+    binary += String.fromCharCode(byte);
+  }
+  return btoa(binary)
     .replace(/\+/g, '-')
     .replace(/\//g, '_')
     .replace(/=+$/, '');
@@ -21,8 +26,17 @@ export function publicKeyCredentialSupported(): boolean {
   return typeof window.PublicKeyCredential !== 'undefined' && !!navigator.credentials;
 }
 
+function extractPublicKeyOptions(options: unknown): Record<string, unknown> {
+  const root = options as Record<string, unknown>;
+  const wrapped = root.publicKey;
+  if (wrapped && typeof wrapped === 'object') {
+    return wrapped as Record<string, unknown>;
+  }
+  return root;
+}
+
 export function decodeCreationOptions(options: unknown): PublicKeyCredentialCreationOptions {
-  const o = options as Record<string, unknown>;
+  const o = extractPublicKeyOptions(options);
   const user = o.user as Record<string, unknown>;
 
   return {
@@ -43,7 +57,7 @@ export function decodeCreationOptions(options: unknown): PublicKeyCredentialCrea
 }
 
 export function decodeRequestOptions(options: unknown): PublicKeyCredentialRequestOptions {
-  const o = options as Record<string, unknown>;
+  const o = extractPublicKeyOptions(options);
 
   return {
     ...o,
@@ -64,6 +78,7 @@ export function encodeRegistrationCredential(credential: PublicKeyCredential): o
     id: credential.id,
     rawId: arrayBufferToBase64Url(credential.rawId),
     type: credential.type,
+    clientExtensionResults: credential.getClientExtensionResults?.() ?? {},
     response: {
       clientDataJSON: arrayBufferToBase64Url(response.clientDataJSON),
       attestationObject: arrayBufferToBase64Url(response.attestationObject),
@@ -78,6 +93,7 @@ export function encodeAssertionCredential(credential: PublicKeyCredential): obje
     id: credential.id,
     rawId: arrayBufferToBase64Url(credential.rawId),
     type: credential.type,
+    clientExtensionResults: credential.getClientExtensionResults?.() ?? {},
     response: {
       clientDataJSON: arrayBufferToBase64Url(response.clientDataJSON),
       authenticatorData: arrayBufferToBase64Url(response.authenticatorData),

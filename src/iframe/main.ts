@@ -4,11 +4,11 @@ import { injectStyles } from './styles';
 
 injectStyles();
 
-const root = document.getElementById('paze-root')!;
+const root = document.getElementById('demo-root')!;
 root.innerHTML = '<div class="loading"><div class="spinner"></div><div>Loading checkout...</div></div>';
 
 window.addEventListener('message', async (event: MessageEvent) => {
-  if (event.data?.type !== 'PAZE_INIT') return;
+  if (event.data?.type !== 'DEMO_INIT') return;
   if (event.source !== window.parent) return;
 
   const { sessionId, backendUrl, merchantId, nonce } = event.data.payload as {
@@ -43,26 +43,26 @@ function renderPhoneEntry(root: HTMLElement, parentOrigin: string, onSubmit: (ph
   root.innerHTML = '';
 
   const title = document.createElement('h2');
-  title.className = 'paze-title';
+  title.className = 'demo-title';
   title.textContent = 'Checkout';
   root.appendChild(title);
 
   const subtitle = document.createElement('p');
-  subtitle.className = 'paze-subtitle';
+  subtitle.className = 'demo-subtitle';
   subtitle.textContent = 'Enter your phone number to access your wallet.';
   root.appendChild(subtitle);
 
   const field = document.createElement('div');
-  field.className = 'paze-field';
+  field.className = 'demo-field';
 
   const label = document.createElement('label');
-  label.className = 'paze-label';
+  label.className = 'demo-label';
   label.textContent = 'Phone Number';
   field.appendChild(label);
 
   const input = document.createElement('input');
   input.type = 'tel';
-  input.className = 'paze-input';
+  input.className = 'demo-input';
   input.placeholder = '+1 555 123 4567';
   field.appendChild(input);
 
@@ -74,7 +74,7 @@ function renderPhoneEntry(root: HTMLElement, parentOrigin: string, onSubmit: (ph
   root.appendChild(demo);
 
   const btn = document.createElement('button');
-  btn.className = 'paze-btn paze-btn-primary';
+  btn.className = 'demo-btn demo-btn-primary';
   btn.textContent = 'Continue';
   btn.addEventListener('click', async () => {
     const phone = input.value.trim();
@@ -94,7 +94,7 @@ function renderPhoneEntry(root: HTMLElement, parentOrigin: string, onSubmit: (ph
 
   // Resize parent iframe
   window.parent.postMessage(
-    { type: 'PAZE_RESIZE', payload: { height: root.scrollHeight + 48 } },
+    { type: 'DEMO_RESIZE', payload: { height: root.scrollHeight + 48 } },
     parentOrigin
   );
 }

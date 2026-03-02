@@ -6,8 +6,8 @@ export default defineConfig({
   build: {
     lib: {
       entry: resolve(__dirname, 'src/index.ts'),
-      name: 'PazeCheckout',
-      fileName: 'paze-checkout',
+      name: 'DemoCheckout',
+      fileName: 'demo-checkout',
       formats: ['es', 'umd'],
     },
     rollupOptions: {

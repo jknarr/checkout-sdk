@@ -16,18 +16,18 @@ export class PasskeyRegisterStep {
     this.root.innerHTML = '';
 
     const title = document.createElement('h2');
-    title.className = 'paze-title';
+    title.className = 'demo-title';
     title.textContent = 'Save this checkout with a passkey';
     this.root.appendChild(title);
 
     const subtitle = document.createElement('p');
-    subtitle.className = 'paze-subtitle';
+    subtitle.className = 'demo-subtitle';
     subtitle.textContent =
       'Use your fingerprint, face, or device PIN next time. This is optional.';
     this.root.appendChild(subtitle);
 
     const createBtn = document.createElement('button');
-    createBtn.className = 'paze-btn paze-btn-primary';
+    createBtn.className = 'demo-btn demo-btn-primary';
     createBtn.textContent = 'Create passkey';
     createBtn.addEventListener('click', async () => {
       createBtn.disabled = true;
@@ -56,7 +56,7 @@ export class PasskeyRegisterStep {
     this.root.appendChild(createBtn);
 
     const skipBtn = document.createElement('button');
-    skipBtn.className = 'paze-btn paze-btn-secondary';
+    skipBtn.className = 'demo-btn demo-btn-secondary';
     skipBtn.textContent = 'Not now';
     skipBtn.addEventListener('click', async () => {
       skipBtn.disabled = true;

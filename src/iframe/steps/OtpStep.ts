@@ -12,12 +12,12 @@ export class OtpStep {
     this.root.innerHTML = '';
 
     const title = document.createElement('h2');
-    title.className = 'paze-title';
+    title.className = 'demo-title';
     title.textContent = 'Enter verification code';
     this.root.appendChild(title);
 
     const subtitle = document.createElement('p');
-    subtitle.className = 'paze-subtitle';
+    subtitle.className = 'demo-subtitle';
     subtitle.textContent = `We sent a 6-digit code to ${this.state.phoneNumber ?? 'your phone'}.`;
     this.root.appendChild(subtitle);
 
@@ -51,7 +51,7 @@ export class OtpStep {
     this.root.appendChild(otpContainer);
 
     const btn = document.createElement('button');
-    btn.className = 'paze-btn paze-btn-primary';
+    btn.className = 'demo-btn demo-btn-primary';
     btn.textContent = 'Verify Code';
     btn.addEventListener('click', () => {
       const otpCode = inputs.map(i => i.value).join('');
@@ -71,7 +71,7 @@ export class OtpStep {
 
     if (this.state.hasPasskey && publicKeyCredentialSupported()) {
       const passkeyBtn = document.createElement('button');
-      passkeyBtn.className = 'paze-btn paze-btn-secondary';
+      passkeyBtn.className = 'demo-btn demo-btn-secondary';
       passkeyBtn.textContent = 'Use passkey instead';
       passkeyBtn.addEventListener('click', () => {
         passkeyBtn.disabled = true;

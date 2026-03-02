@@ -2,12 +2,12 @@
   "name": "checkout-sdk",
   "version": "0.1.0",
   "type": "module",
-  "main": "./dist/paze-checkout.umd.cjs",
-  "module": "./dist/paze-checkout.js",
+  "main": "./dist/demo-checkout.umd.cjs",
+  "module": "./dist/demo-checkout.js",
   "exports": {
     ".": {
-      "import": "./dist/paze-checkout.js",
-      "require": "./dist/paze-checkout.umd.cjs"
+      "import": "./dist/demo-checkout.js",
+      "require": "./dist/demo-checkout.umd.cjs"
     }
   },
   "scripts": {
